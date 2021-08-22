@@ -5,7 +5,7 @@ import os
 import requests
 from time import sleep
 # from untils.utils import datafile
-datafile = '/mnt/d/My projects/selfiehacks/jina/data/smol.csv'
+datafile = 'path of datafile'
 
 def clear_everything():
     os.system('cls' if os.name == 'nt' else 'clear')
