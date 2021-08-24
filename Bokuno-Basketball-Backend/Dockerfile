@@ -22,17 +22,13 @@ EXPOSE 45678
 
 ENTRYPOINT ["python", "app.py", "-t", "query_restful"]
 
-LABEL author="Jina AI Dev-Team (dev-team@jina.ai)"
+LABEL author="Rudransh Sharma"
 LABEL type="app"
 LABEL kind="example"
 LABEL avatar="None"
-LABEL description="Jina App to do cross modal search between images and captions using Flickr8k and CLIP models"
+LABEL description="Using CLIP models to search for basketball related images using both text and image modality"
 LABEL documentation="https://github.com/jina-ai/examples/tree/master/cross-modal-search"
-LABEL keywords="[examples, cross-modal, CLIP, Flickr8k, Computer Vision, NLP]"
 LABEL license="apache-2.0"
-LABEL name="crossmodalsearch"
+LABEL name="bokuno-basuke"
 LABEL platform="linux/amd64"
 LABEL update="None"
-LABEL url="https://github.com/jina-ai/examples/tree/master/cross-modal-search"
-LABEL vendor="Jina AI Limited"
-LABEL version="0.0.3"
