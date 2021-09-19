@@ -93,6 +93,11 @@ def get_data_loader(split, root, captions, batch_size=8, dataset_type='f30k', sh
 
 
 def input_index_data(num_docs=None, batch_size=8, dataset_type='f30k'):
+    """
+    Indexer function, this takes the data and wrap it with the Jina's own Document datatype which is then yeiled to be used by Jina's indexing flow. It is essentially a generator 
+    It has the capabiilty to use other datasets than the one which is being used in the document 
+    """
+    
     captions = 'dataset_flickr30k.json' if dataset_type == 'f30k' else 'captions.txt'
     if dataset_type == 'toy-data':
         base_folder = '.'
