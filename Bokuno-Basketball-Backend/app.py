@@ -1,6 +1,6 @@
-__copyright__ = "Copyright (c) 2021 Jina AI Limited. All rights reserved."
-__license__ = "Apache-2.0"
-
+"""
+Imports
+"""
 import os
 import sys
 
@@ -10,12 +10,22 @@ import logging
 from jina.logging.profile import TimeContext
 
 from dataset import input_index_data
+"""
+Need to define the max docs which Jina would both index and query the same thing could be done in the YAML file as well, but since I am using .PY file
+for the executors so It was best to define it like that
+"""
 
 MAX_DOCS = int(os.environ.get("JINA_MAX_DOCS", 50))
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 
 
+
 def config():
+    """
+    This function defines the main things which are needed for Jina to work properly, the main thing here, which is absolutely needed is the workspace DIR
+    Everytime Jina indexes documents, it makes a folder, named Workspace, which contains all the key things which It will need during Indexing
+    """
+    
     os.environ['JINA_PARALLEL'] = os.environ.get('JINA_PARALLEL', '1')
     os.environ['JINA_SHARDS'] = os.environ.get('JINA_SHARDS', '1')
     os.environ["JINA_WORKSPACE"] = os.environ.get("JINA_WORKSPACE", "workspace")
@@ -23,18 +33,29 @@ def config():
 
 
 def index_restful():
+    """
+    This enpoint is supposed to index all the documents dynamically, all it needs is a post request on this endpoint to add the documents into the indexed documents which could 
+    be the used to querry
+    """
+
     flow = Flow().load_config('flows/flow-index.yml', override_with={'protocol': 'http'})
     with flow:
         flow.block()
 
 
 def check_index_result(resp):
+    """
+    for testing if the idexing is done correctly or not
+    """
     for doc in resp.data.docs:
         _doc = Document(doc)
         print(f'{_doc.id[:10]}, buffer: {len(_doc.buffer)}, mime_type: {_doc.mime_type}, modality: {_doc.modality}, embed: {_doc.embedding.shape}, uri: {_doc.uri[:20]}')
 
 
 def check_query_result(resp):
+    """
+    this does a single request on the server to check if the returned documents is correct. Meaning, text and the images are being retuened or not
+    """
     for doc in resp.data.docs:
         _doc = Document(doc)
         print(f'{_doc.id[:10]}, buffer: {len(_doc.buffer)}, embed: {_doc.embedding.shape}, uri: {_doc.uri[:20]}, chunks: {len(_doc.chunks)}, matches: {len(_doc.matches)}')
@@ -44,6 +65,10 @@ def check_query_result(resp):
 
 
 def index(data_set, num_docs, request_size):
+    """
+    This function is the heart of any Jina flow. It goes through all the documents and then it indexes them, which the query flow would use to return the results.
+    """
+
     flow = Flow().load_config('flows/flow-index.yml')
     with flow:
         with TimeContext(f'QPS: indexing {num_docs}', logger=flow.logger):
@@ -55,6 +80,11 @@ def index(data_set, num_docs, request_size):
 
 
 def query():
+    """
+    Used to give only a single post request. This function works best for testing as can be seen by the on done callback, since this fucntion would open up
+    a new query flow each time it is called, it is neither time effiecient nor memory and cannot scale or be used to put into production
+    """
+
     flow = Flow().load_config('flows/flow-query.yml')
     with flow:
         flow.search(inputs=[
@@ -65,9 +95,17 @@ def query():
 
 
 def query_restful():
+    """
+    Main function which is used to call the query flow and it usses the Rest interface to serve search queries and return the results from the indexed database 
+    """
     flow = Flow().load_config('flows/flow-query.yml', override_with={'protocol': 'http'})
     with flow:
         flow.block()
+
+
+"""
+using the click module to run this script in the terminal, mainly one should use the -t index and the -t query_restful
+"""
 
 
 @click.command()
